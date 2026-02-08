@@ -74,15 +74,80 @@ Not responsible for:
 
 **VM02 - Artifactory Server**
 
-- this VM responsible for the Artifacts, also act als Artifactory Server
-- store and serve images, binaries etc. 
+Responsibiliteis:
+- Store build artifacts
+- Serve container images / packages
+- Maintain artifact metadata
+- Provide controlled access to build outputs
+- Persist CI state across rebuilds
+
+Core Software
+- JFrog Artifactory
+- PostgreSQL (Artifactory DB)
+- Podman
+- systemd
+
+Summary
+- Receives artifacts from TeamCity
+- Stores binaries, container layers, metadata
+- Acts as the single source of truth for build outputs
+- Serves artifacts to runtime systems (VM-03)
+- Keeps CI stateless by externalizing storage
+
+Later - Storage separation
+- Artifact binaries → large volume
+- Database data → separate volume
+- Backups possible without CI downtime
+
+
 
 **VM03 - Runtime Host**
 
-- this VM run containers, which are managed via systemd
-- pull images/artifacts from vm02
+Responsibilities
+- Pull approved artifacts/images
+- Run application containers
+- Manage lifecycle via systemd
+- Restart, monitor, and isolate services
+
+Core Software
+- Rocky Linux 10.1
+- Podman
+- systemd
+- Application containers
+- Optional monitoring agents
+
+Summary
+- Pulls released artifacts from VM-02
+- Starts containers via systemd units
+
+Ensures:
+- Auto-start on boot
+- Restart on failure
+- Resource isolation
+- Acts as the production-like execution environment
+
+Critical role
+- systemd + container integration
+- Runtime vs build separation
+- Operational troubleshooting
+- Real Linux service management
+
+## Lab summary
+
+1. Developer pushes code → GitHub
+2. TeamCity (VM-01) is triggered
+3. Code is built & tested
+4. Container image is created
+5. Artifact is published → Artifactory (VM-02)
+6. Runtime host (VM-03) pulls artifact
+7. systemd starts container
+8. Application runs persistently
+
+| VM           | CI | Artifact | DB | Runtime |
+| ------------ | -- | -------- | -- | ------- |
+| VM-01 (CI)   | ✅  | ❌        | ❌  | ❌       |
+| VM-02 (Repo) | ❌  | ✅        | ✅  | ❌       |
+| VM-03 (Run)  | ❌  | ❌        | ❌  | ✅       |
 
 
-
-# Content
 
