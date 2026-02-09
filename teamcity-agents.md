@@ -98,14 +98,17 @@ nano buildAgent.properties
 serverUrl=http://localhost:8111
 name=agent-local-01
 
+# set permissions
+
+sudo chown -R $USER:$USER /opt/teamcity-agents/buildAgentFull
+
 # save and exit, after that
+# start the agents
 
 cd /opt/teamcity-agents/buildAgentFull/bin
 ./agent.sh start
 
-
-
-# start the agents
+# check it
 
 ./agent.sh status
 
@@ -139,6 +142,40 @@ sudo chown -R $USER:$USER /opt/teamcity-agent
 
 ```
 ## Troubleshooting at start
+
+| Symptom                    | Cause                        |
+| -------------------------- | ---------------------------- |
+| Agent doesn’t start        | Java missing / wrong version |
+| Agent starts but no builds | Not authorized               |
+| Build waits forever        | Capability mismatch          |
+| Agent connects then drops  | Wrong serverUrl              |
+| Permission errors          | Wrong agent user             |
+
+### Clean restart
+
+```bash
+./agent.sh stop
+rm -f /opt/teamcity-agents/buildAgentFull/logs/buildAgent.*
+./agent.sh start
+```
+### Clean runtime state
+
+- first, stop everything that is agent-related
+- then
+
+```bash
+cd /opt/teamcity-agents
+
+for d in buildAgentFull buildAgentFull-02 buildAgentFull-03 buildAgentFull-04; do
+  rm -rf $d/logs/* $d/work/* $d/temp/* $d/system/*
+done
+```
+- after that, verify agent names, must be all unique
+- restart them one by one
+
+
+---
+---
 
 ```bash
 # we get a error message
