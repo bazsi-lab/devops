@@ -147,7 +147,7 @@ systemctl status postgresql-17.service
 
 
 
-#### Configure Postgresqls
+#### Configure Postgresql
 
 ```bash
 # variant a, configure postgresql
@@ -217,31 +217,6 @@ psql -U artifactory -h 127.0.0.1 -d artifactory
 \q
 
 # install required extensions
-
-sudo -u postgres psql -d artifactory
-
-CREATE EXTENSION IF NOT EXISTS pg_trgm;
-\dx
-\q
-
-# install postgresql jdbc driver - system-wide
-
-dnf -y install postgresql-jdbc
-
-# Service state
-systemctl status postgresql-17 --no-pager
-
-# Port check
-ss -lntp | grep 5432
-
-# Confirm extension installed
-sudo -u postgres psql -d artifactory -c "\dx" | grep pg_trgm
-
-# Confirm contrib installed
-rpm -qa | grep postgresql17-contrib
-
-# Confirm version
-psql -U postgres -h 127.0.0.1 -d postgres -c "SELECT version();"
 
 
 ```
