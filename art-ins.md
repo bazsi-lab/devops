@@ -261,7 +261,8 @@ local   all   postgres   peer
 
 # reload config
 
-J
+sudo pg_ctl reload
+sudo systemctl reload postgresql
 
 # set password for postgres superuser
 
